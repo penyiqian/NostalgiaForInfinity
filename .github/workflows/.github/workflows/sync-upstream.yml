@@ -27,7 +27,6 @@ name: Sync NostalgiaForInfinity Strategy
           uses: actions/checkout@v4
           with:
             fetch-depth: 0
-            token: ${{ secrets.GITHUB_TOKEN }}
 
         - name: Configure Git
           run: |
@@ -44,17 +43,14 @@ name: Sync NostalgiaForInfinity Strategy
           run: |
             LOCAL_HASH=$(git hash-object ${{ env.STRATEGY_FILE }} 2>/dev/null || echo "none")
             UPSTREAM_HASH=$(git ls-tree upstream/${{ env.UPSTREAM_BRANCH }} --format='%(objectname)' -- ${{ env.STRATEGY_FILE }} 2>/dev/null || echo "none")
-            echo "本地哈希: $LOCAL_HASH"
-            echo "上游哈希: $UPSTREAM_HASH"
+            echo "本地: $LOCAL_HASH"
+            echo "上游: $UPSTREAM_HASH"
             if [ "$LOCAL_HASH" != "$UPSTREAM_HASH" ] || [ "${{ github.event.inputs.force_update }}" = "true" ]; then
               echo "has_updates=true" >> $GITHUB_OUTPUT
             else
               echo "has_updates=false" >> $GITHUB_OUTPUT
             fi
-            UPSTREAM_COMMIT=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
-            UPSTREAM_MESSAGE=$(git log -1 --format="%s" upstream/${{ env.UPSTREAM_BRANCH }})
-            echo "upstream_commit=$UPSTREAM_COMMIT" >> $GITHUB_OUTPUT
-            echo "upstream_message=$UPSTREAM_MESSAGE" >> $GITHUB_OUTPUT
+            echo "upstream_commit=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})" >> $GITHUB_OUTPUT
 
         - name: Sync from Upstream
           if: steps.check_updates.outputs.has_updates == 'true'
@@ -62,33 +58,13 @@ name: Sync NostalgiaForInfinity Strategy
             git merge upstream/${{ env.UPSTREAM_BRANCH }} --no-edit --allow-unrelated-histories || {
               git checkout --theirs .
               git add .
-              git commit -m "chore: resolve merge conflicts using upstream version"
+              git commit -m "chore: sync upstream"
             }
             git push origin ${{ env.UPSTREAM_BRANCH }}
 
         - name: Trigger Webhook
           if: steps.check_updates.outputs.has_updates == 'true'
-          env:
-            WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
-            WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
           run: |
-            if [ -z "$WEBHOOK_URL" ]; then
-              echo "WEBHOOK_URL 未配置"
-              exit 0
-            fi
-            PAYLOAD='{"action":"sync","strategy":"${{ env.STRATEGY_FILE }}","commit":"${{ steps.check_updates.outputs.upstream_commit }}","message":"策略已更新"}'
-            if [ -n "$WEBHOOK_SECRET" ]; then
-              SIGNATURE="sha256=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" | cut -d' ' -f2)"
-              curl -s -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -H "X-Hub-Signature-256: $SIGNATURE" -d "$PAYLOAD"
-            else
-              curl -s -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d "$PAYLOAD"
-            fi
-
-        - name: Summary
-          run: |
-            echo "## 同步摘要" >> $GITHUB_STEP_SUMMARY
-            if [ "${{ steps.check_updates.outputs.has_updates }}" = "true" ]; then
-              echo "✅ 已同步更新: ${{ steps.check_updates.outputs.upstream_message }}" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "ℹ️ 无需更新" >> $GITHUB_STEP_SUMMARY
-            fi
+            curl -s -X POST "${{ secrets.WEBHOOK_URL }}" \
+              -H "Content-Type: application/json" \
+              -d '{"action":"sync","message":"策略已更新"}'
