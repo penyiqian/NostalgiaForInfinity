@@ -69,7 +69,7 @@ class NostalgiaForInfinityX7(IStrategy):
   INTERFACE_VERSION = 3
 
   def version(self) -> str:
-    return "v17.3.371"
+    return "v17.3.382"
 
   stoploss = -0.99
 
@@ -3025,14 +3025,10 @@ class NostalgiaForInfinityX7(IStrategy):
     # RSI
     informative_1d["RSI_3"] = pta.rsi(informative_1d["close"], length=3)
     informative_1d["RSI_14"] = pta.rsi(informative_1d["close"], length=14)
-    informative_1d["RSI_3_change_pct"] = (
-      (informative_1d["RSI_3"] - informative_1d["RSI_3"].shift(1)) / (informative_1d["RSI_3"].shift(1))
-    ) * 100.0
-    informative_1d["RSI_14_change_pct"] = (
-      (informative_1d["RSI_14"] - informative_1d["RSI_14"].shift(1)) / (informative_1d["RSI_14"].shift(1))
-    ) * 100.0
-    informative_1d["RSI_3_diff"] = informative_1d["RSI_3"] - informative_1d["RSI_3"].shift(1)
-    informative_1d["RSI_14_diff"] = informative_1d["RSI_14"] - informative_1d["RSI_14"].shift(1)
+    informative_1d["RSI_3_change_pct"] = informative_1d["RSI_3"].pct_change() * 100.0
+    informative_1d["RSI_14_change_pct"] = informative_1d["RSI_14"].pct_change() * 100.0
+    informative_1d["RSI_3_diff"] = informative_1d["RSI_3"].diff()
+    informative_1d["RSI_14_diff"] = informative_1d["RSI_14"].diff()
     # BB 20 - STD2
     bbands_20_2 = pta.bbands(informative_1d["close"], length=20)
     informative_1d["BBL_20_2.0"] = bbands_20_2["BBL_20_2.0"] if isinstance(bbands_20_2, pd.DataFrame) else np.nan
@@ -3161,14 +3157,10 @@ class NostalgiaForInfinityX7(IStrategy):
     # RSI
     informative_4h["RSI_3"] = pta.rsi(informative_4h["close"], length=3)
     informative_4h["RSI_14"] = pta.rsi(informative_4h["close"], length=14)
-    informative_4h["RSI_3_change_pct"] = (
-      (informative_4h["RSI_3"] - informative_4h["RSI_3"].shift(1)) / (informative_4h["RSI_3"].shift(1))
-    ) * 100.0
-    informative_4h["RSI_14_change_pct"] = (
-      (informative_4h["RSI_14"] - informative_4h["RSI_14"].shift(1)) / (informative_4h["RSI_14"].shift(1))
-    ) * 100.0
-    informative_4h["RSI_3_diff"] = informative_4h["RSI_3"] - informative_4h["RSI_3"].shift(1)
-    informative_4h["RSI_14_diff"] = informative_4h["RSI_14"] - informative_4h["RSI_14"].shift(1)
+    informative_4h["RSI_3_change_pct"] = informative_4h["RSI_3"].pct_change() * 100.0
+    informative_4h["RSI_14_change_pct"] = informative_4h["RSI_14"].pct_change() * 100.0
+    informative_4h["RSI_3_diff"] = informative_4h["RSI_3"].diff()
+    informative_4h["RSI_14_diff"] = informative_4h["RSI_14"].diff()
     # EMA
     informative_4h["EMA_12"] = pta.ema(informative_4h["close"], length=12)
     informative_4h["EMA_200"] = pta.ema(informative_4h["close"], length=200, fillna=0.0)
@@ -3211,10 +3203,7 @@ class NostalgiaForInfinityX7(IStrategy):
     informative_4h["STOCHRSId_14_14_3_3"] = (
       stochrsi["STOCHRSId_14_14_3_3"] if isinstance(stochrsi, pd.DataFrame) else np.nan
     )
-    informative_4h["STOCHRSIk_14_14_3_3_change_pct"] = (
-      (informative_4h["STOCHRSIk_14_14_3_3"] - informative_4h["STOCHRSIk_14_14_3_3"].shift(1))
-      / informative_4h["STOCHRSIk_14_14_3_3"].shift(1)
-    ) * 100.0
+    informative_4h["STOCHRSIk_14_14_3_3_change_pct"] = (informative_4h["STOCHRSIk_14_14_3_3"].pct_change()) * 100.0
     # KST
     kst = pta.kst(informative_4h["close"])
     informative_4h["KST_10_15_20_30_10_10_10_15"] = (
@@ -3225,9 +3214,7 @@ class NostalgiaForInfinityX7(IStrategy):
     informative_4h["UO_7_14_28"] = pta.uo(informative_4h["high"], informative_4h["low"], informative_4h["close"])
     # OBV
     informative_4h["OBV"] = pta.obv(informative_4h["close"], informative_4h["volume"])
-    informative_4h["OBV_change_pct"] = (
-      (informative_4h["OBV"] - informative_4h["OBV"].shift(1)) / abs(informative_4h["OBV"].shift(1))
-    ) * 100.0
+    informative_4h["OBV_change_pct"] = (informative_4h["OBV"].pct_change()) * 100.0
     # ROC
     informative_4h["ROC_2"] = pta.roc(informative_4h["close"], length=2)
     informative_4h["ROC_9"] = pta.roc(informative_4h["close"], length=9)
@@ -3238,9 +3225,7 @@ class NostalgiaForInfinityX7(IStrategy):
     informative_4h["CCI_20"] = (
       (informative_4h["CCI_20"]).astype(np.float64).replace(to_replace=[np.nan, None], value=(0.0))
     )
-    informative_4h["CCI_20_change_pct"] = (
-      (informative_4h["CCI_20"] - informative_4h["CCI_20"].shift(1)) / abs(informative_4h["CCI_20"].shift(1))
-    ) * 100.0
+    informative_4h["CCI_20_change_pct"] = (informative_4h["CCI_20"].pct_change()) * 100.0
 
     # Candle change
     informative_4h["change_pct"] = (informative_4h["close"] - informative_4h["open"]) / informative_4h["open"] * 100.0
@@ -3332,14 +3317,10 @@ class NostalgiaForInfinityX7(IStrategy):
     # RSI
     informative_1h["RSI_3"] = pta.rsi(informative_1h["close"], length=3)
     informative_1h["RSI_14"] = pta.rsi(informative_1h["close"], length=14)
-    informative_1h["RSI_3_change_pct"] = (
-      (informative_1h["RSI_3"] - informative_1h["RSI_3"].shift(1)) / (informative_1h["RSI_3"].shift(1))
-    ) * 100.0
-    informative_1h["RSI_14_change_pct"] = (
-      (informative_1h["RSI_14"] - informative_1h["RSI_14"].shift(1)) / (informative_1h["RSI_14"].shift(1))
-    ) * 100.0
-    informative_1h["RSI_3_diff"] = informative_1h["RSI_3"] - informative_1h["RSI_3"].shift(1)
-    informative_1h["RSI_14_diff"] = informative_1h["RSI_14"] - informative_1h["RSI_14"].shift(1)
+    informative_1h["RSI_3_change_pct"] = informative_1h["RSI_3"].pct_change() * 100.0
+    informative_1h["RSI_14_change_pct"] = informative_1h["RSI_14"].pct_change() * 100.0
+    informative_1h["RSI_3_diff"] = informative_1h["RSI_3"].diff()
+    informative_1h["RSI_14_diff"] = informative_1h["RSI_14"].diff()
     # EMA
     informative_1h["EMA_12"] = pta.ema(informative_1h["close"], length=12)
     informative_1h["EMA_200"] = pta.ema(informative_1h["close"], length=200, fillna=0.0)
@@ -3394,15 +3375,10 @@ class NostalgiaForInfinityX7(IStrategy):
     informative_1h["UO_7_14_28"] = (
       (informative_1h["UO_7_14_28"]).astype(np.float64).replace(to_replace=[np.nan, None], value=(50.0))
     )
-    informative_1h["UO_7_14_28_change_pct"] = (
-      (informative_1h["UO_7_14_28"] - informative_1h["UO_7_14_28"].shift(1))
-      / abs(informative_1h["UO_7_14_28"].shift(1))
-    ) * 100.0
+    informative_1h["UO_7_14_28_change_pct"] = informative_1h["UO_7_14_28"].pct_change() * 100.0
     # OBV
     informative_1h["OBV"] = pta.obv(informative_1h["close"], informative_1h["volume"])
-    informative_1h["OBV_change_pct"] = (
-      (informative_1h["OBV"] - informative_1h["OBV"].shift(1)) / abs(informative_1h["OBV"].shift(1))
-    ) * 100.0
+    informative_1h["OBV_change_pct"] = informative_1h["OBV"].pct_change() * 100.0
     # ROC
     informative_1h["ROC_2"] = pta.roc(informative_1h["close"], length=2)
     informative_1h["ROC_9"] = pta.roc(informative_1h["close"], length=9)
@@ -3413,9 +3389,7 @@ class NostalgiaForInfinityX7(IStrategy):
     informative_1h["CCI_20"] = (
       (informative_1h["CCI_20"]).astype(np.float64).replace(to_replace=[np.nan, None], value=(0.0))
     )
-    informative_1h["CCI_20_change_pct"] = (
-      (informative_1h["CCI_20"] - informative_1h["CCI_20"].shift(1)) / abs(informative_1h["CCI_20"].shift(1))
-    ) * 100.0
+    informative_1h["CCI_20_change_pct"] = informative_1h["CCI_20"].pct_change() * 100.0
     # Candle change
     informative_1h["change_pct"] = (informative_1h["close"] - informative_1h["open"]) / informative_1h["open"] * 100.0
     # Wicks
@@ -3495,12 +3469,8 @@ class NostalgiaForInfinityX7(IStrategy):
     # RSI
     informative_15m["RSI_3"] = pta.rsi(informative_15m["close"], length=3)
     informative_15m["RSI_14"] = pta.rsi(informative_15m["close"], length=14)
-    informative_15m["RSI_3_change_pct"] = (
-      (informative_15m["RSI_3"] - informative_15m["RSI_3"].shift(1)) / (informative_15m["RSI_3"].shift(1))
-    ) * 100.0
-    informative_15m["RSI_14_change_pct"] = (
-      (informative_15m["RSI_14"] - informative_15m["RSI_14"].shift(1)) / (informative_15m["RSI_14"].shift(1))
-    ) * 100.0
+    informative_15m["RSI_3_change_pct"] = informative_15m["RSI_3"].pct_change() * 100.0
+    informative_15m["RSI_14_change_pct"] = informative_15m["RSI_14"].pct_change() * 100.0
     # EMA
     informative_15m["EMA_12"] = pta.ema(informative_15m["close"], length=12)
     informative_15m["EMA_20"] = pta.ema(informative_15m["close"], length=20)
@@ -3535,14 +3505,10 @@ class NostalgiaForInfinityX7(IStrategy):
     )
     # UO
     informative_15m["UO_7_14_28"] = pta.uo(informative_15m["high"], informative_15m["low"], informative_15m["close"])
-    informative_15m["UO_7_14_28_change_pct"] = (
-      informative_15m["UO_7_14_28"] - informative_15m["UO_7_14_28"].shift(1)
-    ) * 100.0
+    informative_15m["UO_7_14_28_change_pct"] = informative_15m["UO_7_14_28"].pct_change() * 100.0
     # OBV
     informative_15m["OBV"] = pta.obv(informative_15m["close"], informative_15m["volume"])
-    informative_15m["OBV_change_pct"] = (
-      (informative_15m["OBV"] - informative_15m["OBV"].shift(1)) / abs(informative_15m["OBV"].shift(1))
-    ) * 100.0
+    informative_15m["OBV_change_pct"] = informative_15m["OBV"].pct_change() * 100.0
     # ROC
     informative_15m["ROC_9"] = pta.roc(informative_15m["close"], length=9)
     # CCI
@@ -3552,9 +3518,7 @@ class NostalgiaForInfinityX7(IStrategy):
     informative_15m["CCI_20"] = (
       (informative_15m["CCI_20"]).astype(np.float64).replace(to_replace=[np.nan, None], value=(0.0))
     )
-    informative_15m["CCI_20_change_pct"] = (
-      (informative_15m["CCI_20"] - informative_15m["CCI_20"].shift(1)) / abs(informative_15m["CCI_20"].shift(1))
-    ) * 100.0
+    informative_15m["CCI_20_change_pct"] = informative_15m["CCI_20"].pct_change() * 100.0
     # Candle change
     informative_15m["change_pct"] = (
       (informative_15m["close"] - informative_15m["open"]) / informative_15m["open"] * 100.0
@@ -3640,8 +3604,8 @@ class NostalgiaForInfinityX7(IStrategy):
     df["RSI_4"] = pta.rsi(df["close"], length=4)
     df["RSI_14"] = pta.rsi(df["close"], length=14)
     df["RSI_20"] = pta.rsi(df["close"], length=20)
-    df["RSI_3_change_pct"] = ((df["RSI_3"] - df["RSI_3"].shift(1)) / (df["RSI_3"].shift(1))) * 100.0
-    df["RSI_14_change_pct"] = ((df["RSI_14"] - df["RSI_14"].shift(1)) / (df["RSI_14"].shift(1))) * 100.0
+    df["RSI_3_change_pct"] = df["RSI_3"].pct_change() * 100.0
+    df["RSI_14_change_pct"] = df["RSI_14"].pct_change() * 100.0
     # EMA
     df["EMA_3"] = pta.ema(df["close"], length=3)
     df["EMA_9"] = pta.ema(df["close"], length=9)
@@ -3695,7 +3659,7 @@ class NostalgiaForInfinityX7(IStrategy):
     df["KSTs_9"] = kst["KSTs_9"] if isinstance(kst, pd.DataFrame) else np.nan
     # OBV
     df["OBV"] = pta.obv(df["close"], df["volume"])
-    df["OBV_change_pct"] = ((df["OBV"] - df["OBV"].shift(1)) / abs(df["OBV"].shift(1))) * 100.0
+    df["OBV_change_pct"] = df["OBV"].pct_change() * 100.0
     # ROC
     df["ROC_2"] = pta.roc(df["close"], length=2)
     df["ROC_9"] = pta.roc(df["close"], length=9)
@@ -13063,6 +13027,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((df["RSI_3_4h"] > 3.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 40.0) | (df["ROC_9_1d"] > -30.0))
             # 4h down move, 1h still high, 4h downtrend
             & ((df["RSI_3_4h"] > 3.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 50.0) | (df["ROC_9_4h"] > -30.0))
+            # 4h down move, 4h & 1d downtrend
+            & ((df["RSI_3_4h"] > 3.0) | (df["ROC_9_4h"] > -20.0) | (df["ROC_9_1d"] > -20.0))
             # 4h down move, 15m high, 1h still high
             & ((df["RSI_3_4h"] > 5.0) | (df["AROONU_14_15m"] < 70.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 50.0))
             # 4h down move, 15m high
@@ -13426,6 +13392,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((df["RSI_3_1h"] > 30.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 40.0) | (df["STOCHRSIk_14_14_3_3_4h"] < 70.0))
             # 1h down move, 4h & 1d downtrend
             & ((df["RSI_3_1h"] > 30.0) | (df["ROC_9_4h"] > -25.0) | (df["ROC_9_1d"] > -60.0))
+            # 1h down move, 4h & 1d overbought
+            & ((df["RSI_3_1h"] > 30.0) | (df["ROC_9_4h"] < 20.0) | (df["ROC_9_1d"] < 100.0))
             # 1h down move, 4h high, 1d overbought
             & ((df["RSI_3_1h"] > 35.0) | (df["AROONU_14_4h"] < 85.0) | (df["ROC_9_1d"] < 100.0))
             # 1h down move, 1h still high, 1d overbought
@@ -13442,6 +13410,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((df["RSI_3_4h"] > 5.0) | (df["RSI_3_1d"] > 10.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 30.0))
             # 4h down move, 4h & 1d downtrend
             & ((df["RSI_3_4h"] > 5.0) | (df["ROC_9_4h"] > -20.0) | (df["ROC_9_1d"] > -25.0))
+            # 4h & 1d down move, 1h still high
+            & ((df["RSI_3_4h"] > 10.0) | (df["RSI_3_1d"] > 10.0) | (df["AROONU_14_1h"] < 40.0))
             # 4h & 1d down move, 1h high
             & ((df["RSI_3_4h"] > 10.0) | (df["RSI_3_1d"] > 15.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 70.0))
             # 4h & 1d down move, 1d high
@@ -14788,6 +14758,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((df["RSI_3_1h"] > 30.0) | (df["CMF_20_4h"] > -0.50) | (df["AROONU_14_4h"] < 100.0))
             # 1h down move, 1h high, 1d downtrend
             & ((df["RSI_3_1h"] > 30.0) | (df["AROONU_14_1h"] < 70.0) | (df["ROC_9_1d"] > -60.0))
+            # 1h down move, 4h high, 1h overbought
+            & ((df["RSI_3_1h"] > 30.0) | (df["AROONU_14_4h"] < 80.0) | (df["ROC_9_1h"] < 50.0))
             # 1h down move, 4h high, 1d downtrend
             & ((df["RSI_3_1h"] > 30.0) | (df["AROONU_14_4h"] < 90.0) | (df["ROC_9_1d"] > -30.0))
             # 1h down move, 4h high, 1d overbought
@@ -18596,6 +18568,10 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((df["RSI_3"] > 3.0) | (df["RSI_3_1h"] > 15.0) | (df["AROONU_14_15m"] < 40.0))
             # 5m & 4h down move, 15m still high
             & ((df["RSI_3"] > 3.0) | (df["RSI_3_4h"] > 5.0) | (df["AROONU_14_15m"] < 40.0))
+            # 5m & 4h down move, 15m still high
+            & ((df["RSI_3"] > 3.0) | (df["RSI_3_4h"] > 5.0) | (df["STOCHRSIk_14_14_3_3_15m"] < 40.0))
+            # 5m & 4h down move, 15m still high
+            & ((df["RSI_3"] > 3.0) | (df["RSI_3_4h"] > 20.0) | (df["STOCHRSIk_14_14_3_3_15m"] < 50.0))
             # 5m & 4h down move, 1h high
             & ((df["RSI_3"] > 3.0) | (df["RSI_3_4h"] > 45.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 80.0))
             # 5m & 1d down move, 15m high
@@ -18822,6 +18798,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((df["RSI_3_4h"] > 30.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 80.0) | (df["ROC_9_1d"] > -40.0))
             # 4h down move, 15m still high, 1h high
             & ((df["RSI_3_4h"] > 35.0) | (df["AROONU_14_15m"] < 50.0) | (df["AROONU_14_1h"] < 100.0))
+            # 4h down move, 1d high & overbought
+            & ((df["RSI_3_4h"] > 55.0) | (df["STOCHRSIk_14_14_3_3_1d"] < 90.0) | (df["ROC_9_1d"] < 100.0))
             # 1d down move, 1d high, 4h downtrend
             & ((df["RSI_3_1d"] > 15.0) | (df["AROONU_14_1d"] < 70.0) | (df["ROC_9_4h"] > -40.0))
             # 15m & 1h high, 4h overbought
@@ -19047,6 +19025,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((df["RSI_3_4h"] > 30.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 80.0) | (df["ROC_9_1d"] > -40.0))
             # 4h down move, 15m still high, 1h high
             & ((df["RSI_3_4h"] > 35.0) | (df["AROONU_14_15m"] < 50.0) | (df["AROONU_14_1h"] < 100.0))
+            # 4h down move, 1d high & overbought
+            & ((df["RSI_3_4h"] > 55.0) | (df["STOCHRSIk_14_14_3_3_1d"] < 90.0) | (df["ROC_9_1d"] < 100.0))
             # 1d down move, 1d high, 4h downtrend
             & ((df["RSI_3_1d"] > 15.0) | (df["AROONU_14_1d"] < 70.0) | (df["ROC_9_4h"] > -40.0))
             # 1d down move, 1d high, 1d downtrend
@@ -19138,6 +19118,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((df["RSI_3_15m"] > 10.0) | (df["RSI_3_4h"] > 10.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 50.0))
             # 15m & 4h down move, 1h high
             & ((df["RSI_3_15m"] > 10.0) | (df["RSI_3_4h"] > 20.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 70.0))
+            # 15m & 1d down move, 4h still high
+            & ((df["RSI_3_15m"] > 10.0) | (df["RSI_3_1d"] > 10.0) | (df["STOCHRSIk_14_14_3_3_4h"] < 40.0))
             # 15m down move, 15m high, 1d high
             & ((df["RSI_3_15m"] > 10.0) | (df["AROONU_14_15m"] < 60.0) | (df["AROONU_14_1d"] < 100.0))
             # 15m & 4h down move, 1h high
@@ -19323,10 +19305,14 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((df["RSI_3_4h"] > 15.0) | (df["STOCHRSIk_14_14_3_3_15m"] < 70.0))
             # 4h down move, 4h high, 1d high
             & ((df["RSI_3_4h"] > 30.0) | (df["AROONU_14_4h"] < 70.0) | (df["STOCHRSIk_14_14_3_3_1d"] < 80.0))
+            # 4h down move, 1d high & overbought
+            & ((df["RSI_3_4h"] > 55.0) | (df["STOCHRSIk_14_14_3_3_1d"] < 90.0) | (df["ROC_9_1d"] < 100.0))
             # 1d down move, 4h & 1d downtrend
             & ((df["RSI_3_1d"] > 10.0) | (df["ROC_9_4h"] > -20.0) | (df["ROC_9_1d"] > -20.0))
             # 1d down move, 1d high, 4h downtrend
             & ((df["RSI_3_1d"] > 15.0) | (df["AROONU_14_1d"] < 70.0) | (df["ROC_9_4h"] > -20.0))
+            # 4h high, 4h & 1d overbought
+            & ((df["AROONU_14_4h"] < 90.0) | (df["ROC_9_4h"] < 30.0) | (df["ROC_9_1d"] < 60.0))
             # 15m still high, 4h & 1d overbought
             & ((df["STOCHRSIk_14_14_3_3_15m"] < 50.0) | (df["ROC_9_4h"] < 40.0) | (df["ROC_9_1d"] < 100.0))
             # 1d high, 4h & 1d overbought
@@ -19449,6 +19435,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((df["RSI_3_4h"] > 15.0) | (df["AROONU_14_4h"] < 70.0) | (df["AROONU_14_1d"] < 70.0))
             # 4h down move, 15m high, 1d overbought
             & ((df["RSI_3_4h"] > 30.0) | (df["STOCHRSIk_14_14_3_3_15m"] < 90.0) | (df["ROC_9_1d"] < 10.0))
+            # 4h down move, 1d high & overbought
+            & ((df["RSI_3_4h"] > 55.0) | (df["STOCHRSIk_14_14_3_3_1d"] < 90.0) | (df["ROC_9_1d"] < 100.0))
             # 1d down move, 1d high, 1d downtrend
             & ((df["RSI_3_1d"] > 15.0) | (df["AROONU_14_1d"] < 70.0) | (df["ROC_9_1d"] > -20.0))
             # 1d down move, 1h high, 1d downtrend
@@ -19676,6 +19664,8 @@ class NostalgiaForInfinityX7(IStrategy):
           long_entry_logic.append(
             (df["RSI_3_4h"] > 40.0) | (df["AROONU_14_15m"] < 80.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 70.0)
           )
+          # 4h down move, 1d high & overbought
+          long_entry_logic.append((df["RSI_3_4h"] > 40.0) | (df["AROONU_14_1d"] < 80.0) | (df["ROC_9_1d"] < 20.0))
           # 4h down move, 15m still high, 1h high
           long_entry_logic.append(
             (df["RSI_3_4h"] > 40.0) | (df["STOCHRSIk_14_14_3_3_15m"] < 40.0) | (df["STOCHRSIk_14_14_3_3_1h"] < 80.0)
@@ -20207,6 +20197,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((df["RSI_3_4h"] > 25.0) | (df["RSI_3_1d"] > 25.0) | (df["CMF_20_1h"] > -0.3) | (df["CMF_20_4h"] > -0.4))
             # 4h down move, 15m still high, 1d overbought
             & ((df["RSI_3_4h"] > 40.0) | (df["AROONU_14_15m"] < 50.0) | (df["ROC_9_1d"] < 50.0))
+            # 4h down move, 4h high, 1d overbought
+            & ((df["RSI_3_4h"] > 40.0) | (df["AROONU_14_4h"] < 80.0) | (df["ROC_9_1d"] < 20.0))
             # 4h down move, 4h & 1d overbought
             & ((df["RSI_3_4h"] > 40.0) | (df["ROC_9_4h"] < 10.0) | (df["ROC_9_1d"] < 50.0))
             # 4h down move, 1d high, 4h overbought
